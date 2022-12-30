@@ -1,0 +1,29 @@
+#### nao funciona ####
+
+
+body = document.getElementsByTagName("body")
+
+video = document.createElement("video"); 
+
+attrId = document.createAttribute("id"); 
+attrId.value="preview"; 
+video.setAttributeNode(attrId); 
+
+attrId = document.createAttribute("autoplay"); 
+
+body[0].appendChild(video)
+
+
+button = document.getElementsByTagName("button")
+
+button[0].setAttribute("text", "print screen");
+button[0].setAttribute("style", "float: right, background-color:red");
+button[0].addEventListener("click", async () => {
+	debugger;
+	preview = document.getElementById("preview")
+	preview.srcObject = await navigator.mediaDevices.getDisplayMedia({
+		video: {cursor: "always"}, audio: false
+	})
+})
+
+body[0].appendChild(button[0])

@@ -1,0 +1,197 @@
+    onPlantValueHelpRequested: function () {
+      const oController = this;
+      const oInputPlant = this.getView().byId("plantFilterInput");
+      new Promise((fnApprove) => {
+        const oDialog = this.valuehelp._callGenericValueHelpRequested({
+          sourceMultiInput: "plantFilterInput",
+          model: "ODataMainModel",
+          entity: "PlantSet",
+          entityType: "PlantType",
+          aFieldnames: [
+            { columnName: "Werks" },
+            { columnName: "Name1" }
+          ],
+          fragmentName: "aurora.fiori.app.fragments.PlantValueHelpDialog"
+        });
+        fnApprove(oDialog);
+      }).then(function (oDialog) {
+        oDialog.attachOk(async function (oEvent) {
+          var aTokens = oEvent.getParameter("tokens");
+          if (aTokens.length > 0) {
+            oInputPlant.setSelectedKey(aTokens[0].getKey());
+            oInputPlant.setValue(aTokens[0].getKey());
+            const oMainModel = oController.getView().getModel("ODataMainModel");
+            function fnPromiseRes() {
+              return new Promise((fnApprove) => {
+                oMainModel.read("/PlantSet", {//mudar
+                  success: function (oData) {
+                    fnApprove(oData);
+                  }
+                });
+              });
+            }
+            var aPlantOptions = await fnPromiseRes();
+            var aSelectedPlant = aPlantOptions.results.find(function (plant) {
+              return plant.Werks === aTokens[0].getKey();
+            });
+            oController.getView().setModel(
+              new JSONModel(aSelectedPlant),
+              "PlantValues"//mudar
+            );
+            var oTableModel = oController.getView().getModel("DataResults");
+            var oTableModelData = oTableModel.getData().results;
+            var oTableModelDataLength = oTableModelData.length;
+            for (var i = 0; i < oTableModelDataLength; i++) {
+              var plantDescriptionPath = "/results/" + i + "/PlantDescription";
+              oTableModel.setProperty(
+                plantDescriptionPath,
+                aSelectedPlant.Name1
+              );
+            }
+          }
+        });
+      });
+    },
+
+
+==================================================================
+
+
+
+sap.ui.define([
+    "sap/ui/core/UIComponent",
+    "sap/m/SearchField",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/ColumnListItem",
+    "sap/m/Label",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "sap/ui/core/Fragment",
+  ], function (UIComponent, SearchField, JSONModel, ColumnListItem, Label, Filter, FilterOperator, Fragment, ) {
+    "use strict";
+
+    return UIComponent.extend("aurora.fiori.app.util.ValueHelp", {
+
+        constructor: function (oView) {
+            this.oView = oView;
+        },
+
+        _callGenericValueHelpRequested: async function ({ sourceMultiInput, model, entity, entityType, aFieldnames, fragmentName }) {
+            const oView = this.oView;
+            const oController = this;
+            const oMultiInputTarget = oView.byId(sourceMultiInput);
+
+            var oModel = oView.getModel(model);
+            var oBasicSearchField = new SearchField();
+
+            var oFragment = await Fragment.load({
+                name: fragmentName,
+                controller: this
+            }).catch(function () {
+                sap.m.MessageToast.show("Error opening search help.");
+            });
+
+
+            oView.addDependent(oFragment);
+            var oValueHelpDialog = oFragment;
+
+            var oFilterBar = oValueHelpDialog.getFilterBar();
+            oFilterBar.setFilterBarExpanded(false);
+            oFilterBar.setBasicSearch(oBasicSearchField);
+
+            oFilterBar.attachSearch(function () {
+                oController._callFilterBarSearch(oValueHelpDialog,
+                    aFieldnames.map(c => { return { column: c.columnName }; })
+                );
+            });
+            oBasicSearchField.attachSearch(function () {
+                oController._callFilterBarSearch(oValueHelpDialog,
+                    aFieldnames.map(c => { return { column: c.columnName }; })
+                );
+            });
+
+            oValueHelpDialog.getTableAsync().then(function (oTable) {
+                oTable.setModel(oModel);
+                var oColumnsModel = new JSONModel({
+                    cols: aFieldnames.map(c => {
+                        return {
+                            label: oModel.getProperty("/#" + entityType + "/" + c.columnName + "/@sap:label"),
+                            template: model + ">" + c.columnName
+                        };
+                    })
+                    });
+
+                oTable.setModel(oColumnsModel, "columns");
+
+                if (oTable.bindRows) {
+                    oTable.bindAggregation("rows", model + ">/" + entity);
+                }
+
+                if (oTable.bindItems) {
+                    oTable.bindAggregation("items", model + ">/" + entity, function () {
+                        return new ColumnListItem({
+                            cells: aCols.map(function (column) {
+                                return new Label({ text: "{" + column.template + "}" });
+                            })
+                        });
+                    });
+                }
+
+                oValueHelpDialog.update();
+            });
+
+            oValueHelpDialog.attachOk(function (oEvent) {
+                var aTokens = oEvent.getParameter("tokens");
+                oMultiInputTarget.setValue(aTokens[0].getKey());
+                this.close();
+            });
+
+            oValueHelpDialog.attachCancel(function () {
+                this.close();
+            });
+
+            oValueHelpDialog.attachAfterClose(function () {
+                this.destroy();
+            });
+            oValueHelpDialog.open();
+            return oValueHelpDialog;
+
+        },
+
+        _callFilterBarSearch: function (oValueHelpDialog, aCols) {
+            var oFilterBar = oValueHelpDialog.getFilterBar();
+
+            oValueHelpDialog.getTableAsync().then(function (oTable) {
+                var oBinding = oTable.getBinding("rows");
+                var sSearchQuery = oFilterBar.getBasicSearchValue();
+                var aFilters = [];
+
+                // Advanced search
+                oFilterBar.getFilterGroupItems().forEach(function (o) {
+                    var oInput = o.getControl();
+                    if (oInput.getValue()) {
+                        aFilters.push(new Filter({
+                            path: oInput.getName(),
+                            operator: FilterOperator.Contains,
+                            value1: oInput.getValue()
+                        }));
+                    }
+                });
+
+                // Basic Search
+                if (sSearchQuery) {
+                    aFilters.push(new Filter({
+                        filters: aCols.map(function (col) {
+                            return new Filter({ path: col.column, operator: FilterOperator.Contains, value1: sSearchQuery });
+                        }),
+                        and: false
+                    }));
+                }
+
+                oBinding.filter(aFilters);
+            });
+        }
+
+
+    });
+  });

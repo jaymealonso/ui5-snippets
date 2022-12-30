@@ -1,0 +1,5 @@
+; Buscar dados carregados no modelo atual
+
+var bindingContext = this.getView().getBindingContext();
+var path = bindingContext.getPath();
+var object = bindingContext.getModel().getProperty(path);

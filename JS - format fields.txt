@@ -1,0 +1,29 @@
+
+
+####################################################
+# Currency
+####################################################
+
+            <Text text="{
+                parts:[{path:'local>kwert'},{path:'local>Currency'}],
+                type: 'sap.ui.model.type.Currency',
+                formatOptions: {
+                  showMeasure: true,
+                  minFractionDigits: 2,
+                  maxFractionDigits: 2
+                }
+            }"/>
+
+####################################################
+# Date
+####################################################
+                  <Text id="idModdate" text="{
+                      path : 'local>/header/moddate', 
+                      type : 'sap.ui.model.type.Date',
+                      formatOptions: {
+                        style: 'short',
+                        UTC: true
+                      }
+                    }" />
+
+

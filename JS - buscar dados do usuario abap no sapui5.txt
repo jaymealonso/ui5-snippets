@@ -1,0 +1,27 @@
+sapu5 get abap username
+
+
+1. adicionar no index.htm, com o launchpad não precisa
+
+		<script src="resources/sap/ushell_abap/bootstrap/abap.js"></script>
+		
+		
+2. adicionar o caminho no neo-app.json, dentro do routes (caso esteja executando do web ide)
+
+
+    {
+      "path": "/sap/bc/ui2",
+      "target": {
+        "type": "destination",
+        "name": "Netcare",
+        "entryPath": "/sap/bc/ui2"
+      },
+      "description": "Netcare"
+    },
+
+
+3. codigo
+
+			sap.ushell.Container.getService("UserInfo");
+			var oUserInfo = new sap.ushell.services.UserInfo();
+			var sUsername = oUserInfo.getId();

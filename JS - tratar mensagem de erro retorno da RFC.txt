@@ -1,0 +1,54 @@
+			MessageBox.confirm("Deseja deletar a Marcação?", { 
+					title: "Deletar?",
+					refreshAfterChange: true,
+					onClose: function(oAction) {
+						if (oAction === "OK") {
+							oCtx.oModel.remove(oCtx.sPath, {
+								success: function (oEvent) {
+									tblMarcacoes.setBusy(false);
+								},
+								error: function (oError) {
+									tblMarcacoes.setBusy(false);
+									if (oError) {
+										var oErrorJson = jQuery.parseJSON(oError.responseText);
+										MessageBox.error(oErrorJson.error.message.value);
+									}
+								}
+							});
+						}
+					}
+			});
+
+========================================================================
+Usando submitChanges
+========================================================================
+
+        new Promise((fnApprove, fnReject) => {
+
+          oModel.submitChanges({
+            success: (oResultData, oResponseblock) => {
+              var oChangeResponse = oResultData.__batchResponses.find(f => f.__changeResponses);
+              oChangeResponse = oChangeResponse ? oChangeResponse.__changeResponses[0] : undefined;
+              const oResponse =
+                oChangeResponse ||
+                oResultData.__batchResponses[0].response ||
+                oResultData.__batchResponses[0] || oResultData;
+              if (oResponse.statusCode < 299 ) {
+                sap.m.MessageToast.show("All changes Ok!");
+                oController.onNavBack();
+              } else {
+                fnReject(oResponse);
+              }
+            },
+            error: e => fnReject(e)
+          });
+       }).catch((error) => {
+        var oDetails = "";
+        try {
+          oDetails = JSON.parse(error.body);
+        } catch {
+          oDetails = error.body || error;
+        }
+        MessageBox.error("An error has ocurred trying to save the document.", {details: oDetails});
+       });
+      }
