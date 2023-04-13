@@ -1,0 +1,59 @@
+
+
+SEGW - Transação SEGW 
+LPD_CUST - Configração do Launchpad
+/IWFND/GW_CLIENT - Transação /IWFND/GW_CLIENT 
+/IWFND/MAINT_SERVICE - Ativar e atualizar serviços 
+/IWFND/ERROR_LOG - Transação /IWFND/ERROR_LOG 
+/UI2/FLPD_CONF - Fiori Lpd. Designer (vál.p/VrsMand.) 
+/UI2/SEMOBJ - Definir objeto semântico - cliente 
+/UI5/THEME_DESIGNER - Transação /UI5/THEME_DESIGNER 
+/ui5/theme_tool - baixar/subir temas
+/UI2/NWBC_CFG_SAP - configurar tema padrao
+/IWBEP/ERROR_LOG
+/IWFND/CACHE_CLEANUP - Cleanup of Model Cache 
+/IWBEP/ERROR_LOG - Log erros Backend
+SUI_SUPPORT - suporte para tecnologias UI
+/IWFND/TRACES - payload/performance trace
+
+GATEWAY
+========================================================
+SM05 > sessões HTTP Token issued
+
+TRacing tools
+========================================================
+    1. Run transaction /IWFND/ERROR_LOG or /IWBEP/ERROR_LOG
+    2. Choose Error Log-> Global Configuration.
+       A pop-up will appear for changing the log level.
+
+
+Limpar cache do gateway
+/n/iwfnd/cache_cleanup
+
+SAP Repo
+https://github.com/SAP
+
+Open SAP course repo
+https://github.com/SAP/openSAP-ui5-course
+
+
+Report
+Recalcula indice de blibliotecas ui5 para deteccao via webide no deploy (escalonar JOB) 
+ver SAP Note 2364579.
+Report /UI5/APP_INDEX_CALCULATE
+
+
+Depois de transportar para o QAS erro de "Error - found in negative cache error for Component.js"
+=================================================================================================
+Hi Saurabh,
+Is BSP activated ? Go to SICF -> sap/bc/bsp/zinv_apv. Activate it.
+Check your odata node as well in sicf. I see zot_taskprocessing_*
+After this clear all cache after import.
+Clear metadata cache
+Transaction: /IWFND/CACHE_CLEANUP on Gateway
+Transaction: /IWBEP/CACHE_CLEANUP on Backend and Gateway
+Run the report /UI2/CHIP_SYNCHRONIZE_CACHE. Make sure there is no error in the table /UI2/CHIP_CHDR
+Run the report /UI2/DELETE_CACHE_AFTER_IMP and /UI2/DELETE_CACHE
+Run the report /UI5/UPDATE_CACHEBUSTER and  /UI2/INVALIDATE_GLOBAL_CACHES
+
+

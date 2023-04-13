@@ -1,0 +1,60 @@
+---------------------------------------------------
+Run local service with bindings to the Cloud Foundry
+---------------------------------------------------
+cds bind -2 com-sap-moncler-r1scp006re-xsuaa-srv:com-sap-moncler-r1scp006re-uaa-key,com-sap-moncler-r1scp006re-destination-service:com-sap-moncler-r1scp006re-destination-content-com-sap-moncler-r1scp006re-destination-service-credentials
+
+cds bind -2 
+com-sap-moncler-r1scp006re-xsuaa-srv:com-sap-moncler-r1scp006re-uaa-key,
+com-sap-moncler-r1scp006re-destination-service:com-sap-moncler-r1scp006re-destination-content-
+com-sap-moncler-r1scp006re-destination-service-credentials
+
+
+
+---------------------------------------------------
+Running SCPCross locally using binding - for JAVA services (not NODE)
+---------------------------------------------------
+
+cds bind -2 moncler-xsuaa-service:uaa_moncler-key
+cds bind -2 moncler-destination-service:moncler-destination-content-moncler-destination-service-credentials
+cds bind -2 moncler-db
+cds bind -2 moncler-connectivity
+
+npm i passport
+npm i @sap/xssec
+
+sudo apt-get install maven
+
+// create db.sqlite locally
+cds deploy --to sqlite
+
+
+
+---- running java services locally ----
+
+cds bind --exec -- mvn spring-boot:run
+----
+cds bind --exec --profile hybrid -- mvn spring-boot:run
+
+----
+
+VCAP_SERVICES=$(cf env moncler-srv | perl -0pe '/VCAP_SERVICES:(.*?)VCAP_APPLICATION:/smg; $_=$1') cds watch --profile hybrid
+
+---------------------------------------------------
+
+name
+sap.ids/uaa#jayme.a.neto@accenture.com:D0@3991adae-cfb2-4953-a116-6df5cde5e911
+ jayme@LIS-5Y06GS3  ~/documents/moncler-dev/ScpCross-old   master ±  cf service-keys moncler-connectivity
+Getting keys for service instance moncler-connectivity as jayme.a.neto@accenture.com...
+No service key for service instance moncler-connectivity
+ jayme@LIS-5Y06GS3  ~/documents/monc
+
+
+
+
+cf env moncler-srv
+
+-->
+ 
+"clientid": "sb-na-e34858ce-3b3d-448d-ad6f-41b092b4dc82!t142744",
+"clientsecret": "DYoBpPpQ1I43Nern1kk2pUjnKJs=",
+"url": "https://monlcer-r1-sc-cf-dev.authentication.eu10.hana.ondemand.com",
