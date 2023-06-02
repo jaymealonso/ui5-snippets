@@ -57,3 +57,8 @@ Run the report /UI2/DELETE_CACHE_AFTER_IMP and /UI2/DELETE_CACHE
 Run the report /UI5/UPDATE_CACHEBUSTER and  /UI2/INVALIDATE_GLOBAL_CACHES
 
 
+Desabilita a autenticacao por SAML2 para URLS
+=============================================
+?saml2=disabled
+
+
