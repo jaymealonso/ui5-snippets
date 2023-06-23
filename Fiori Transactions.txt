@@ -15,6 +15,7 @@ LPD_CUST - Configração do Launchpad
 /IWBEP/ERROR_LOG - Log erros Backend
 SUI_SUPPORT - suporte para tecnologias UI
 /IWFND/TRACES - payload/performance trace
+SUI_SUPPORT - Support for UI Tecnology
 
 GATEWAY
 ========================================================
@@ -60,5 +61,12 @@ Run the report /UI5/UPDATE_CACHEBUSTER and  /UI2/INVALIDATE_GLOBAL_CACHES
 Desabilita a autenticacao por SAML2 para URLS
 =============================================
 ?saml2=disabled
+
+remove extension de um servico nota 2520936 - Undo Redefining OData Service
+=============================================
+/IWBEP/REG_MODEL     Maintain Model
+/IWBEP/REG_SERVICE   Maintain Service
+/IWBEP/REG_VOCAN     Maintain Vocabulary Annotations
+
 
 
